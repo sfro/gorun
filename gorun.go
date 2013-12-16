@@ -122,15 +122,8 @@ func Compile(sourcefile, runfile string) (err error) {
 			return errors.New("can't find go tool")
 		}
 	}
-	n := TheChar()
-	gcout := runfile + "." + pid + "." + n
 	ldout := runfile + "." + pid
-	err = Exec([]string{gotool, "tool", n + "g", "-o", gcout, sourcefile})
-	if err != nil {
-		return err
-	}
-	defer os.Remove(gcout)
-	err = Exec([]string{gotool, "tool", n + "l", "-o", ldout, gcout})
+	err = Exec([]string{gotool, "build", "-o", ldout, sourcefile})
 	if err != nil {
 		return err
 	}
@@ -220,17 +213,4 @@ func RunDir() (rundir string, err error) {
 		prefixi = prefix + "-" + strconv.FormatUint(i, 10)
 	}
 	panic("unreachable")
-}
-
-// TheChar returns the magic architecture char.
-func TheChar() string {
-	switch runtime.GOARCH {
-	case "386":
-		return "8"
-	case "amd64":
-		return "6"
-	case "arm":
-		return "5"
-	}
-	panic("unknown GOARCH: " + runtime.GOARCH)
 }
